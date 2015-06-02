@@ -388,7 +388,18 @@
         });
         proc.stderr.on('data', function (data) {
           console.log(name,'error',data.toString());
-
+          var m = me.processByName(name).messages;
+          m.reverse();
+          m.push({
+            datetime: new Date(),
+            message: data.toString()
+          });
+          m.reverse();
+          if (m.length>20){
+            m=m.slice(0,20);
+          }
+          me.processByName(name).messages = m;
+          riot.update();
 
         });
         proc.on('message',function(message){
