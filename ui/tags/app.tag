@@ -317,7 +317,11 @@
     }
 
     exit(e){
-      process.exit();
+      var gui = require('nw.gui');
+      console.log(gui.App.argv);
+      gui.App.quit();
+      //gui.App.manifest.name
+      //process.exit();
     }
 
     processByName(name){
