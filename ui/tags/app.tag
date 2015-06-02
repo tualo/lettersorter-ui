@@ -54,6 +54,7 @@
               - {datetime}
             </p>
           </div>
+          <div class="panel-footer">{cmd}</div>
         </div>
 
         <div class="panel panel-default" id="settings">
@@ -113,6 +114,9 @@
     </div>
   </div>
   <script>
+    var spawn = require('child_process').spawn;
+    var path = require('path');
+    var os = require('os');
 
     this.current = "";
 
@@ -204,9 +208,7 @@
     }
     global.getSetting = this.getSetting;
 
-    var spawn = require('child_process').spawn;
-    var path = require('path');
-
+    this.iFaces = os.networkInterfaces();
     this.url = '';
     this.client = '';
     this.login = '';
@@ -269,6 +271,7 @@
                           "--unclearread",prefix+"unclear/"
                         ];
 
+                        me.services[3].arguments = [me.getByBroadcast(),prefix];
                         riot.update();
                       })
                     })
@@ -290,6 +293,7 @@
         title: 'Master-Service',
         running: false,
         messages: [],
+        cmd: '',
         command: 'sorter',
         arguments: []
       },
@@ -298,6 +302,7 @@
         title: 'Kamera-Service',
         running: false,
         messages: [],
+        cmd: '',
         command: 'gigecamera',
         arguments: []
       },
@@ -305,8 +310,18 @@
         icon: 'barcode',
         title: 'OCR-Service',
         running: false,
+        cmd: '',
         messages: [],
         command: 'ocrservice',
+        arguments: []
+      },
+      {
+        icon: 'server',
+        title: 'GVSP-Service',
+        running: false,
+        cmd: '',
+        messages: [],
+        command: 'gige',
         arguments: []
       }
     ]
@@ -366,6 +381,18 @@
       if ((me.services[index]) && (me.services[index].running===false)){
 
         var proc = spawn(name, me.services[index].arguments );
+        var displayArgs = me.services[index].arguments;
+        var block=false;
+        for(var i=0;i<displayArgs.length;i++){
+          if (block){
+            displayArgs[i]='xxxx';
+          }
+          block = false;
+          if (displayArgs[i].indexOf('password')!=-1){
+            block = true;
+          }
+        }
+        me.services[index].cmd = name+' '+displayArgs.join(' ');
         proc.on('error',function(error){
           console.log(name,error);
           me.services[index].running=false;
@@ -416,6 +443,34 @@
 
       }
     }
+
+
+
+
+
+    getByBroadcast(){
+      var me = this;
+      ;
+      var ip4 = null;
+      for(var name in me.iFaces){
+        var list = me.iFaces[name];
+        for(var i=0;i<list.length;i++){
+          if (list[i].family==='IPv4'){
+            ip4=list[i];
+          }
+        }
+        if (ip4!==null){
+          var baddr = ip4.address.split('.');
+          baddr[3] = 255;
+          if(baddr.join('.')===me.broadcast){
+            return ip4.address;
+          }
+        }
+      }
+      return '127.0.0.1';
+    }
+
+
     var me=this;
     setTimeout(function(){
       $('#settings').hide();
