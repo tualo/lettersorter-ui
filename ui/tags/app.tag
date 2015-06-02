@@ -120,6 +120,13 @@
 
     this.current = "";
 
+    var me = this;
+    process.on('exit', function() {
+      console.log('killing', me.services.length, 'child processes');
+      me.services.forEach(function(child) {
+        child.process.kill();
+      });
+    });
 
     showClicked(e){
       console.log(e);
