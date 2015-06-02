@@ -165,6 +165,7 @@
       var me=this;db = this.getDB();
       db.transaction(function (tx) {
         tx.executeSql('DELETE FROM settings');
+
         tx.executeSql('INSERT INTO settings (id, val) VALUES ("url", "https://localhost/macc/index.php")');
         tx.executeSql('INSERT INTO settings (id, val) VALUES ("client", "macc")');
         tx.executeSql('INSERT INTO settings (id, val) VALUES ("login", "sorter")');
@@ -254,7 +255,7 @@
                     me.getSetting('broadcast',function(err,broadcast){
                       me.broadcast=broadcast;
                       me.getSetting('mtu',function(err,mtu){
-
+                        me.mtu=mtu;
                         me.services[1].arguments = [
                           '--mtu',mtu,
                           '--height',height,
