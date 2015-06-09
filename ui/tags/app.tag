@@ -263,6 +263,8 @@
                       me.broadcast=broadcast;
                       me.getSetting('mtu',function(err,mtu){
                         me.mtu=mtu;
+
+                        // camera kontrolle
                         me.services[1].arguments = [
                           '--mtu',mtu,
                           '--height',height,
@@ -272,14 +274,17 @@
                           '--prefix',prefix
                         ];
 
+                        // ocr dienst
                         me.services[2].arguments = [
-                          "--path", prefix,
+                          "--path", prefix+'',
                           "--goodread",prefix+"good/",
                           "--badread",prefix+"bad/",
                           "--unclearread",prefix+"unclear/"
                         ];
 
+                        // gige server für camera daten
                         me.services[3].arguments = [me.getByBroadcast(),prefix];
+                        //[me.getByBroadcast(),prefix];
                         riot.update();
                       })
                     })
@@ -341,7 +346,7 @@
 
     exit(e){
       var gui = require('nw.gui');
-      console.log(gui.App.argv);
+      //console.log(gui.App.argv);
       gui.App.quit();
       //gui.App.manifest.name
       //process.exit();
@@ -402,12 +407,13 @@
         }
         me.services[index].cmd = name+' '+displayArgs.join(' ');
         proc.on('error',function(error){
-          console.log(name,error);
+          //console.log(name,error);
           me.services[index].running=false;
           riot.update();
         });
         proc.stdout.on('data', function (data) {
-          console.log(name,'data',data.toString());
+          //console.log(name,'data',data.toString());
+
           var m = me.processByName(name).messages;
           m.reverse();
           m.push({
@@ -419,10 +425,12 @@
             m=m.slice(0,20);
           }
           me.processByName(name).messages = m;
+
           riot.update();
         });
         proc.stderr.on('data', function (data) {
-          console.log(name,'error',data.toString());
+          //console.log(name,'error',data.toString());
+
           var m = me.processByName(name).messages;
           m.reverse();
           m.push({
@@ -434,6 +442,7 @@
             m=m.slice(0,20);
           }
           me.processByName(name).messages = m;
+
           riot.update();
 
         });
@@ -469,6 +478,8 @@
         }
         if (ip4!==null){
           var baddr = ip4.address.split('.');
+        //  alert(baddr);
+
           baddr[3] = 255;
           if(baddr.join('.')===me.broadcast){
             return ip4.address;

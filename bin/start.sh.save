@@ -1,0 +1,7 @@
+#!/bin/sh
+
+nvm use 0.12.0
+cd /home/sbo/lettersorter-ui/
+node bin/lettersorter-ui
+
+
